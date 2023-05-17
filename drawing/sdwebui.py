@@ -40,7 +40,7 @@ class SDWebUI(DrawingAPI):
             'restore_faces': 'false',
             'tiling': 'false',
             'script_name':f'{config.sdwebui.script_name}',
-            'script_args':[prompt],
+            'script_args':[f'{prompt}'],
             'negative_prompt': config.sdwebui.negative_prompt,
             'eta': 0,
             'sampler_index': config.sdwebui.sampler_index
@@ -73,7 +73,7 @@ class SDWebUI(DrawingAPI):
             'restore_faces': 'false',
             'tiling': 'false',
             'script_name':f'{config.sdwebui.script_name}',
-            'script_args':[prompt],
+            'script_args':[f'{prompt}'],
             'negative_prompt': config.sdwebui.negative_prompt,
             'eta': 0,
             'sampler_index': config.sdwebui.sampler_index,
