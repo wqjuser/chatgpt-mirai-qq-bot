@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   chatgpt:
-    image: wqjuser/chatgpt-mirai-qq-bot:browser-version
+    image: wqjuser/chatgpt-mirai-qq-bot:latest
     restart: always
     environment:
       LANG: 'C.UTF-8'
