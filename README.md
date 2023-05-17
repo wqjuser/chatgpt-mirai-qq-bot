@@ -85,7 +85,7 @@
 它会为你安装 Docker、 Docker Compose 和编写配置文件。  
 
 ```bash
-bash -c "$(wget -O- https://gist.githubusercontent.com/lss233/2fdd75be3f0724739368d0dcd9d1367d/raw/62a790da4a391af096074b3355c2c2b7ecab3c28/chatgpt-mirai-installer-gocqhttp.sh)"
+bash -c "$(wget -O- https://gist.githubusercontent.com/wqjuser/8d8255d9274440bf3afbf27fff9f3752/raw/373451d37eec72955056a8097378133d52b7d004/chatbotinstall.sh)"
 ```
 
 </details>
