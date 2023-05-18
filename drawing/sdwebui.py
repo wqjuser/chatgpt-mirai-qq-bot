@@ -28,7 +28,6 @@ class SDWebUI(DrawingAPI):
         }
 
     async def text_to_img(self, prompt):
-        print("用户聊天传入的参数是：",[f"{prompt}"])
         payload = {
             'enable_hr': 'false',
             'denoising_strength': 0.45,
@@ -41,7 +40,7 @@ class SDWebUI(DrawingAPI):
             'restore_faces': 'false',
             'tiling': 'false',
             'script_name':f'{config.sdwebui.script_name}',
-            'script_args':[f"{prompt}"],
+            'script_args':[''+f'{prompt}'],
             'negative_prompt': config.sdwebui.negative_prompt,
             'eta': 0,
             'sampler_index': config.sdwebui.sampler_index
@@ -52,8 +51,6 @@ class SDWebUI(DrawingAPI):
                 payload[key] = 'true' if value else 'false'
             else:
                 payload[key] = value
-
-        print("服务器端传入的参数是:", payload)
 
         resp = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(f"{config.sdwebui.api_url}sdapi/v1/txt2img",
                                                                             json=payload, headers=self.headers)
