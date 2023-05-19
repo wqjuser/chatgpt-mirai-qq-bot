@@ -56,7 +56,6 @@ class HttpService(BaseModel):
     debug: bool = False
     """是否开启debug，错误时展示日志"""
 
-
 class WecomBot(BaseModel):
     host: str = "0.0.0.0"
     """企业微信回调地址，需要能够被公网访问，0.0.0.0则不限制访问地址"""
@@ -167,22 +166,6 @@ class BardCookiePath(BaseModel):
     """Bard 的 Cookie 文件内容"""
     proxy: Optional[str] = None
     """可选的代理地址，留空则检测系统代理"""
-
-
-class BaiduTranslate(BaseModel):
-    translate: bool
-    """是否启用"""
-    app_id: str
-    """百度翻译的appid"""
-    secret_key: str
-    """百度翻译的key"""
-
-
-class DeeplTranslate(BaseModel):
-    translate: bool
-    """是否启用"""
-    api_key: str
-    """deepl翻译的apikey"""
 
 
 class PoeAuths(BaseModel):
@@ -543,9 +526,7 @@ class Config(BaseModel):
     system: System = System()
     presets: Preset = Preset()
     ratelimit: Ratelimit = Ratelimit()
-    # baiducloud: BaiduCloud = BaiduCloud()
-    # baidutranslate: BaiduTranslate = BaiduTranslate()
-    # deepltranslate: DeeplTranslate = DeeplTranslate()
+    baiducloud: BaiduCloud = BaiduCloud()
     vits: VitsConfig = VitsConfig()
 
     # === External Utilities ===
