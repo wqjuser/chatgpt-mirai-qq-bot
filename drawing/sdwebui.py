@@ -54,7 +54,7 @@ class SDWebUI(DrawingAPI):
             else:
                 payload[key] = value
 
-        if '--real' in prompt:
+        if '--real-c' in prompt:
             option_payload = {
                 "sd_model_checkpoint": "chilloutmix.safetensors",
             }
