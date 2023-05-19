@@ -24,12 +24,11 @@ class BardAdapter(BotAdapter):
 
     def __init__(self, session_id: str = ""):
         super().__init__(session_id)
-        self.deepl_api_key = config.DeeplTranslate.api_key
-        self.baidu_secret_key = config.BaiduTranslate.secret_key
-        self.baidu_api_key = config.BaiduTranslate.app_id
-        self.enable_baidu_translate = config.BaiduTranslate.translate
-        self.enable_deepl_translate = config.DeeplTranslate.translate
-        logger.success(f"加载的数据是{self.deepl_api_key, self.baidu_api_key, self.baidu_secret_key}")
+        self.deepl_api_key = None
+        self.baidu_secret_key = None
+        self.baidu_api_key = None
+        self.enable_baidu_translate = True
+        self.enable_deepl_translate = True
         self.at = None
         self.session_id = session_id
         self.account = botManager.pick('bard-cookie')
@@ -123,6 +122,8 @@ class BardAdapter(BotAdapter):
     async def translate_with_baidu(self, text: str, from_lang: str, to_lang: str) -> str:
         url = "http://api.fanyi.baidu.com/api/trans/vip/translate"
         salt = str(hashu(text))
+        self.baidu_api_key = '20230227001577503'
+        self.baidu_secret_key = 'o9kxQADPCdFf56FHPCIv'
         sign_str = self.baidu_api_key + text + salt + self.baidu_secret_key  # don't forget to add the secret key
         sign = hashlib.md5(sign_str.encode()).hexdigest()
         params = {
@@ -140,6 +141,7 @@ class BardAdapter(BotAdapter):
 
     async def translate_with_deepl(self, text: str, from_lang: str, to_lang: str) -> str:
         url = "https://api-free.deepl.com/v2/translate"
+        self.deepl_api_key = '1e23ad70-40b4-7e97-4d08-2239d2e114a6:fx'
         headers = {"Authorization": "DeepL-Auth-Key " + self.deepl_api_key}
         data = {
             "text": text,

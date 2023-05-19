@@ -543,9 +543,9 @@ class Config(BaseModel):
     system: System = System()
     presets: Preset = Preset()
     ratelimit: Ratelimit = Ratelimit()
-    baiducloud: BaiduCloud = BaiduCloud()
-    baidutranslate: BaiduTranslate = BaiduTranslate()
-    deepltranslate: DeeplTranslate = DeeplTranslate()
+    # baiducloud: BaiduCloud = BaiduCloud()
+    # baidutranslate: BaiduTranslate = BaiduTranslate()
+    # deepltranslate: DeeplTranslate = DeeplTranslate()
     vits: VitsConfig = VitsConfig()
 
     # === External Utilities ===
