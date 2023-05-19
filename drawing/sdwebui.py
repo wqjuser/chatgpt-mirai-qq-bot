@@ -5,6 +5,7 @@ from graia.ariadne.message.element import Image
 
 from constants import config
 from .base import DrawingAPI
+from loguru import logger
 
 
 def basic_auth_encode(authorization: str) -> str:
@@ -28,6 +29,7 @@ class SDWebUI(DrawingAPI):
         }
 
     async def text_to_img(self, prompt):
+        logger.info("用户传入的提示词为：", prompt)
         payload = {
             'enable_hr': 'false',
             'denoising_strength': 0.45,
@@ -39,8 +41,8 @@ class SDWebUI(DrawingAPI):
             'cfg_scale': 7.5,
             'restore_faces': 'false',
             'tiling': 'false',
-            'script_name':f'{config.sdwebui.script_name}',
-            'script_args':[''+f'{prompt}'],
+            'script_name': f'{config.sdwebui.script_name}',
+            'script_args': [f'{prompt}'],
             'negative_prompt': config.sdwebui.negative_prompt,
             'eta': 0,
             'sampler_index': config.sdwebui.sampler_index
@@ -52,12 +54,21 @@ class SDWebUI(DrawingAPI):
             else:
                 payload[key] = value
 
+        if '--real' in prompt:
+            option_payload = {
+                "sd_model_checkpoint": "chilloutmix.safetensors",
+            }
+            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(f"{config.sdwebui.api_url}sdapi/v1/options",
+                                                                                json=option_payload, headers=self.headers)
+
         resp = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(f"{config.sdwebui.api_url}sdapi/v1/txt2img",
                                                                             json=payload, headers=self.headers)
         resp.raise_for_status()
         r = resp.json()
-
-        return [Image(base64=i) for i in r.get('images', [])]
+        images = []
+        for i in r['images']:
+            images.append(Image(base64=i))
+        return images
 
     async def img_to_img(self, init_images: List[Image], prompt=''):
         payload = {
@@ -72,8 +83,8 @@ class SDWebUI(DrawingAPI):
             'cfg_scale': 7.5,
             'restore_faces': 'false',
             'tiling': 'false',
-            'script_name':f'{config.sdwebui.script_name}',
-            'script_args':[f'{prompt}'],
+            'script_name': f'{config.sdwebui.script_name}',
+            'script_args': [f'{prompt}'],
             'negative_prompt': config.sdwebui.negative_prompt,
             'eta': 0,
             'sampler_index': config.sdwebui.sampler_index,
