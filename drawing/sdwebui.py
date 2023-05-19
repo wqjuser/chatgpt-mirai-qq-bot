@@ -45,7 +45,7 @@ class SDWebUI(DrawingAPI):
             'script_args': [f'{prompt}'],
             'negative_prompt': config.sdwebui.negative_prompt,
             'eta': 0,
-            'sampler_index': config.sdwebui.sampler_index
+            'sampler_name': config.sdwebui.sampler_index
         }
 
         for key, value in config.sdwebui.dict(exclude_none=True).items():
