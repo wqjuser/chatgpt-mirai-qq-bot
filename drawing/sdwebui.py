@@ -60,6 +60,12 @@ class SDWebUI(DrawingAPI):
             }
             response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(f"{config.sdwebui.api_url}sdapi/v1/options",
                                                                                 json=option_payload, headers=self.headers)
+        else:
+            option_payload = {
+                "sd_model_checkpoint": "meinamix_v9.safetensors",
+            }
+            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(f"{config.sdwebui.api_url}sdapi/v1/options",
+                                                                                    json=option_payload, headers=self.headers)
 
         resp = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(f"{config.sdwebui.api_url}sdapi/v1/txt2img",
                                                                             json=payload, headers=self.headers)
