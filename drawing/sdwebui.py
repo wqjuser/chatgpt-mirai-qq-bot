@@ -155,6 +155,10 @@ class SDWebUI(DrawingAPI):
             r = resp.json()
             return [Image(base64=i) for i in r.get('images', [])]
         else:
+            model_id = "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8"
+            # 更适合肖像的模型
+            if '--R' in prompt:
+                model_id = "a097c2df-8f0c-4029-ae0f-8fd349055e61"
             # need to remove
             pattern_list = ['nsfw', 'sex', 'naked', 'breast', 'sexual intercourse', 'nipple', 'pornographic', 'pussy',
                             '性', '性交', '裸体', '胸部', '色情', '乳头', '阴部']
@@ -198,7 +202,7 @@ class SDWebUI(DrawingAPI):
                 translated_prompt = translated_prompt + ", (realistic, photo-realistic:1.37)"
             payload = {
                 "prompt": f"{translated_prompt}, {config.sdwebui.prompt_prefix}",
-                "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
+                "modelId": model_id,
                 "width": width,
                 "height": height,
                 "promptMagic": True if pm else False,
