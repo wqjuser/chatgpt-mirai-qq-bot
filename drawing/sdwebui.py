@@ -183,17 +183,12 @@ class SDWebUI(DrawingAPI):
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
                 "width": width,
                 "height": height,
-                "num_inference_steps": 30,
-                "promptMagic": True if pm else False,
+                "promptMagic": False,
                 "num_images": image_number,
-                "public": False,
-                "tiling": False,
-                "guidance_scale": 7
+                "presetStyle": "LEONARDO"
             }
             print("莱奥纳多的入参是：", f"{payload}")
             response = requests.post(url, json=payload, headers=headers)
-            # response.raise_for_status()
-            # r = response.json()
             print("莱奥纳多的返回值是：", f"{response.text}")
             return []
             # if response.status_code==200:
