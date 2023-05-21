@@ -161,7 +161,7 @@ class SDWebUI(DrawingAPI):
             if bool(parsed_args):
                 if 'pics' in parsed_args:
                     image_number = int(parsed_args.get('pics'))
-            url = "https://cloud.leonardo.ai/api/rest/v1/generations/"
+            url = "https://cloud.leonardo.ai/api/rest/v1/generations"
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
