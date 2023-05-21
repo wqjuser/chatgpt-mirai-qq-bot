@@ -165,21 +165,19 @@ class SDWebUI(DrawingAPI):
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
+                "Authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
             }
             payload = {
-                "prompt": 'a cute dog',
+                "prompt": scene,
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
-                "width": 512,
-                "height": 512,
-                "negative_prompt": None,
+                "width": width,
+                "height": height,
                 "num_inference_steps": 30,
-                "promptMagic": "false",
                 "num_images": 1,
-                "public": "false",
-                "tiling": "false",
+                "promptMagic": "true" if pm else "false",
                 "guidance_scale": 7
             }
+            logger.error("莱奥纳多的入参是：", f"{payload}")
             response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload, headers=headers)
             response.raise_for_status()
             r = response.json()
