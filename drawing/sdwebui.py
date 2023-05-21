@@ -173,11 +173,11 @@ class SDWebUI(DrawingAPI):
                 "Authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
             }
             # 翻译用户提问为英文
-        translated_prompt = await self.translate_with_deepl(scene, "zh", "en")
-        if translated_prompt is None:
-            translated_prompt = await self.translate_with_baidu(scene, "zh", "en")
-        if translated_prompt is None:
-            translated_prompt = scene
+            translated_prompt = await self.translate_with_deepl(scene, "zh", "en")
+            if translated_prompt is None:
+                translated_prompt = await self.translate_with_baidu(scene, "zh", "en")
+            if translated_prompt is None:
+                translated_prompt = scene
             payload = {
                 "prompt": translated_prompt,
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
