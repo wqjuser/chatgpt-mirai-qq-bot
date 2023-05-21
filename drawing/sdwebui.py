@@ -181,6 +181,9 @@ class SDWebUI(DrawingAPI):
             if bool(parsed_args):
                 if 'pics' in parsed_args:
                     image_number = int(parsed_args.get('pics'))
+                # 支持用户自行从莱奥那多上面寻找并设置modelId
+                if 'M' in parsed_args:
+                    model_id = parsed_args.get('M')
             url = "https://cloud.leonardo.ai/api/rest/v1/generations"
             headers_post = {
                 "accept": "application/json",
