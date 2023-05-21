@@ -1,6 +1,7 @@
 from typing import List
 import base64
 import httpx
+import requests
 from graia.ariadne.message.element import Image
 
 from constants import config
@@ -177,11 +178,11 @@ class SDWebUI(DrawingAPI):
                 "promptMagic": "true" if pm else "false",
                 "guidance_scale": 7
             }
-            logger.error("莱奥纳多的入参是：", f"{payload}")
-            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload, headers=headers)
-            response.raise_for_status()
-            r = response.json()
-            logger.error("莱奥纳多的返回值是：", f"{r}")
+            print("莱奥纳多的入参是：", f"{payload}")
+            response = requests.post(url, json=payload, headers=headers)
+            # response.raise_for_status()
+            # r = response.json()
+            print("莱奥纳多的返回值是：", f"{response.text}")
             return []
             # if response.status_code==200:
 
