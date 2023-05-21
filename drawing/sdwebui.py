@@ -1,7 +1,6 @@
 from typing import List
 import base64
 import httpx
-import requests
 from graia.ariadne.message.element import Image
 
 from constants import config
@@ -152,7 +151,7 @@ class SDWebUI(DrawingAPI):
             pm = False
             if scene != "":
                 parsed_args = parse_args(scene)
-                width_p, height_p, pm_p = parsed_args
+                width_p, height_p, pm_p = deal_with_args(parsed_args)
                 width = width_p
                 height = height_p
                 pm = pm_p
@@ -180,11 +179,11 @@ class SDWebUI(DrawingAPI):
                 "public": "false",
                 "tiling": "false",
                 "guidance_scale": 7
-
             }
-            response = requests.post(url, json=payload, headers=headers)
-            # rt = response.json()
-            logger.error("莱奥纳多的返回值是：", f"{response}")
+            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            r = response.json()
+            logger.error("莱奥纳多的返回值是：", f"{r}")
             return []
             # if response.status_code==200:
 
