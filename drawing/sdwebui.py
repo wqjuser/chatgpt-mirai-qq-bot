@@ -205,7 +205,8 @@ class SDWebUI(DrawingAPI):
                 "public": False,
                 "num_images": image_number,
                 "presetStyle": "LEONARDO",
-                "negative_prompt": "worst quality, bad quality, normal quality, cropping, out of focus, bad anatomy,"
+                "negative_prompt": "(nsfw:1.5),worst quality, bad quality, normal quality, cropping, out of focus, "
+                                   "bad anatomy,"
                                    " sketch, lowres, deformed guitar, extra hand, extra guitar, extra digit, "
                                    "fewer digits, jpeg artifacts, signature, watermark, username, artist name"
             }
@@ -228,9 +229,9 @@ class SDWebUI(DrawingAPI):
                         if rj['generations_by_pk']['status'] == 'COMPLETE':
                             images = rj['generations_by_pk']['generated_images']
                             for image in images:
-                                if not image['nsfw']:
-                                    print("图片地址是：", image['url'])
-                                    pic_urls.append(image['url'])
+                                # if not image['nsfw']: 这里限制好像太强了
+                                print("图片地址是：", image['url'])
+                                pic_urls.append(image['url'])
                             break
                         else:
                             await asyncio.sleep(10)
