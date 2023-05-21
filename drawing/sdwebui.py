@@ -194,6 +194,8 @@ class SDWebUI(DrawingAPI):
             if translated_prompt is None:
                 translated_prompt = scene
             translated_prompt = re.sub(pattern, '', translated_prompt)
+            if "--real" in prompt:
+                translated_prompt = translated_prompt+", (realistic, photo-realistic:1.37)"
             payload = {
                 "prompt": f"{translated_prompt}, {config.sdwebui.prompt_prefix}",
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
@@ -203,7 +205,9 @@ class SDWebUI(DrawingAPI):
                 "public": False,
                 "num_images": image_number,
                 "presetStyle": "LEONARDO",
-                "negative_prompt": config.sdwebui.negative_prompt
+                "negative_prompt": "worst quality, bad quality, normal quality, cropping, out of focus, bad anatomy,"
+                                   " sketch, lowres, deformed guitar, extra hand, extra guitar, extra digit, "
+                                   "fewer digits, jpeg artifacts, signature, watermark, username, artist name"
             }
             print("莱奥纳多的入参是：", f"{payload}")
             response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload,
