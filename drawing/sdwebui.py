@@ -1,6 +1,7 @@
 from typing import List
 import base64
 import httpx
+import requests
 from graia.ariadne.message.element import Image
 
 from constants import config
@@ -181,8 +182,7 @@ class SDWebUI(DrawingAPI):
                 "guidance_scale": 7
 
             }
-            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload,
-                                                                                    headers=headers)
+            response = requests.post(url, json=payload, headers=headers)
             # rt = response.json()
             logger.error("莱奥纳多的返回值是：", f"{response}")
             return []
