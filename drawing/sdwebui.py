@@ -10,7 +10,7 @@ from .base import DrawingAPI
 import aiohttp
 import ctypes
 from graia.ariadne.message.element import Image as GraiaImage
-
+import asyncio
 hashu = lambda word: ctypes.c_uint64(hash(word)).value
 
 
@@ -195,7 +195,7 @@ class SDWebUI(DrawingAPI):
                 translated_prompt = scene
             translated_prompt = re.sub(pattern, '', translated_prompt)
             if "--real" in prompt:
-                translated_prompt = translated_prompt+", (realistic, photo-realistic:1.37)"
+                translated_prompt = translated_prompt + ", (realistic, photo-realistic:1.37)"
             payload = {
                 "prompt": f"{translated_prompt}, {config.sdwebui.prompt_prefix}",
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
@@ -220,15 +220,23 @@ class SDWebUI(DrawingAPI):
                 generation_id = rj['sdGenerationJob']['generationId']
                 print("获取到的创建ID是：", f"{generation_id}")
                 url = url + f"/{generation_id}"
-                resp = await httpx.AsyncClient(timeout=config.sdwebui.timeout).get(url, headers=headers_get)
-                print("获取到的图片信息是：", f"{resp.json()}")
-                if resp.status_code == 200:
-                    r = resp.json()
-                    images = r['generations_by_pk']['generated_images']
-                    for image in images:
-                        if not image['nsfw']:
-                            print("图片地址是：", image['url'])
-                            pic_urls.append(image['url'])
+                while True:
+                    resp = await httpx.AsyncClient(timeout=config.sdwebui.timeout).get(url, headers=headers_get)
+                    rj = resp.json()
+                    print("获取到的图片信息是：", f"{rj}")
+                    if resp.status_code == 200:
+                        if rj['generations_by_pk']['status'] == 'COMPLETE':
+                            images = rj['generations_by_pk']['generated_images']
+                            for image in images:
+                                if not image['nsfw']:
+                                    print("图片地址是：", image['url'])
+                                    pic_urls.append(image['url'])
+                            break
+                        else:
+                            await asyncio.sleep(10)
+            else:
+                response.raise_for_status()
+
             for pic_url in pic_urls:
                 image = await download_image(pic_url)
                 images.append(image)
