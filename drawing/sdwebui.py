@@ -197,11 +197,26 @@ class SDWebUI(DrawingAPI):
                 "negative_prompt": config.sdwebui.negative_prompt,
             }
             print("莱奥纳多的入参是：", f"{payload}")
-            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload, headers=headers)
-            response.raise_for_status()
-            r = response.json()
-            print("莱奥纳多的返回值是：", f"{r}")
-            return []
+            response = requests.post(url, json=payload, headers=headers)
+            print("莱奥纳多的返回值是：", f"{response.text}")
+            rj = response.json()
+            pic_urls = []
+            images = []
+            if response.status_code == 200:
+                generation_id = rj['sdGenerationJob']['generationId']
+                url = url + f"/{generation_id}"
+                resp = requests.get(url, headers=headers)
+                if resp.status_code == 200:
+                    r = resp.json()
+                    images = r['generations_by_pk']['generated_images']
+                    for image in images:
+                        if not image['nsfw']:
+                            print("图片地址是：", image['url'])
+                            pic_urls.append(image['url'])
+            for pic_url in pic_urls:
+                image = await self.__download_image(pic_url)
+                images.append(image)
+            return images
             # if response.status_code==200:
 
     async def img_to_img(self, init_images: List[Image], prompt=''):
