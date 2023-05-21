@@ -10,6 +10,7 @@ from .base import DrawingAPI
 import aiohttp
 import ctypes
 from graia.ariadne.message.element import Image as GraiaImage
+
 hashu = lambda word: ctypes.c_uint64(hash(word)).value
 
 
@@ -179,17 +180,21 @@ class SDWebUI(DrawingAPI):
             if translated_prompt is None:
                 translated_prompt = scene
             payload = {
-                "prompt": translated_prompt,
+                "prompt": f"{config.sdwebui.prompt_prefix}, {translated_prompt}",
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
                 "width": width,
                 "height": height,
-                "promptMagic": False,
+                "promptMagic": True if pm else False,
+                "public": False,
                 "num_images": image_number,
-                "presetStyle": "LEONARDO"
+                "presetStyle": "LEONARDO",
+                "negative_prompt": config.sdwebui.negative_prompt,
             }
             print("莱奥纳多的入参是：", f"{payload}")
-            response = requests.post(url, json=payload, headers=headers)
-            print("莱奥纳多的返回值是：", f"{response.text}")
+            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            r = response.json()
+            print("莱奥纳多的返回值是：", f"{r}")
             return []
             # if response.status_code==200:
 
