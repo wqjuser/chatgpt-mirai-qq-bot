@@ -1,5 +1,5 @@
 import hashlib
-from typing import List
+from typing import List, Any
 import base64
 import httpx
 import requests
@@ -95,6 +95,7 @@ class SDWebUI(DrawingAPI):
         self.deepl_api_key = None
         self.baidu_secret_key = None
         self.api_info = None
+        self.client = httpx.AsyncClient()
         self.headers = {
             "Authorization": f"{init_authorization()}"
         }
@@ -237,7 +238,7 @@ class SDWebUI(DrawingAPI):
                 if resp.status == 200:
                     return GraiaImage(data_bytes=await resp.read())
 
-    async def translate_with_baidu(self, text: str, from_lang: str, to_lang: str) -> str:
+    async def translate_with_baidu(self, text: str, from_lang: str, to_lang: str) -> Any | None:
         url = "http://api.fanyi.baidu.com/api/trans/vip/translate"
         salt = str(hashu(text))
         self.baidu_api_key = '20230227001577503'
@@ -257,7 +258,7 @@ class SDWebUI(DrawingAPI):
             return None
         return response.json()['trans_result'][0]['dst']
 
-    async def translate_with_deepl(self, text: str, from_lang: str, to_lang: str) -> str:
+    async def translate_with_deepl(self, text: str, from_lang: str, to_lang: str) -> Any | None:
         url = "https://api-free.deepl.com/v2/translate"
         self.deepl_api_key = '1e23ad70-40b4-7e97-4d08-2239d2e114a6:fx'
         headers = {"Authorization": "DeepL-Auth-Key " + self.deepl_api_key}
