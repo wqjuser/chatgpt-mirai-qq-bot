@@ -186,18 +186,18 @@ class SDWebUI(DrawingAPI):
                 translated_prompt = scene
             translated_prompt = re.sub(pattern, '', translated_prompt)
             payload = {
-                "prompt": f"{config.sdwebui.prompt_prefix}, {translated_prompt}",
+                "prompt": f"{translated_prompt}, {config.sdwebui.prompt_prefix}",
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
                 "width": width,
                 "height": height,
                 "promptMagic": True if pm else False,
                 "public": False,
                 "num_images": image_number,
-                "presetStyle": "LEONARDO",
-                "negative_prompt": config.sdwebui.negative_prompt,
+                "presetStyle": "LEONARDO"
+                # "negative_prompt": config.sdwebui.negative_prompt,
             }
             print("莱奥纳多的入参是：", f"{payload}")
-            response = requests.post(url, json=payload, headers=headers)
+            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload, headers=headers)
             print("莱奥纳多的返回值是：", f"{response.text}")
             rj = response.json()
             pic_urls = []
@@ -217,7 +217,6 @@ class SDWebUI(DrawingAPI):
                 image = await self.__download_image(pic_url)
                 images.append(image)
             return images
-            # if response.status_code==200:
 
     async def img_to_img(self, init_images: List[Image], prompt=''):
         payload = {
