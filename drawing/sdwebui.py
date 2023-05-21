@@ -185,7 +185,6 @@ class SDWebUI(DrawingAPI):
             }
             headers_get = {
                 "accept": "application/json",
-                "content-type": "application/json",
                 "authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
             }
             # 翻译用户提问为英文
