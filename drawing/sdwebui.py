@@ -183,8 +183,8 @@ class SDWebUI(DrawingAPI):
             }
             response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload,
                                                                                     headers=headers)
-            rt = response.json()
-            logger.error("莱奥纳多的返回值是：", f"{rt}")
+            # rt = response.json()
+            logger.error("莱奥纳多的返回值是：", f"{response}")
             return []
             # if response.status_code==200:
 
