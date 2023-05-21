@@ -3,7 +3,6 @@ import re
 from typing import List, Any
 import base64
 import httpx
-import requests
 from graia.ariadne.message.element import Image
 
 from constants import config
@@ -90,13 +89,19 @@ def deal_with_args(parsed_args):
     return width, height, pm
 
 
+async def download_image(url) -> GraiaImage:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                return GraiaImage(data_bytes=await resp.read())
+
+
 class SDWebUI(DrawingAPI):
 
     def __init__(self):
         self.baidu_api_key = None
         self.deepl_api_key = None
         self.baidu_secret_key = None
-        self.api_info = None
         self.client = httpx.AsyncClient()
         self.headers = {
             "Authorization": f"{init_authorization()}"
@@ -173,7 +178,12 @@ class SDWebUI(DrawingAPI):
                 if 'pics' in parsed_args:
                     image_number = int(parsed_args.get('pics'))
             url = "https://cloud.leonardo.ai/api/rest/v1/generations"
-            headers = {
+            headers_post = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
+            }
+            headers_get = {
                 "accept": "application/json",
                 "content-type": "application/json",
                 "authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
@@ -193,19 +203,22 @@ class SDWebUI(DrawingAPI):
                 "promptMagic": True if pm else False,
                 "public": False,
                 "num_images": image_number,
-                "presetStyle": "LEONARDO"
-                # "negative_prompt": config.sdwebui.negative_prompt,
+                "presetStyle": "LEONARDO",
+                "negative_prompt": config.sdwebui.negative_prompt
             }
             print("莱奥纳多的入参是：", f"{payload}")
-            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload, headers=headers)
-            print("莱奥纳多的返回值是：", f"{response.text}")
+            response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload,
+                                                                                    headers=headers_post)
+            print("莱奥纳多的返回值是：", f"{response.json()}")
             rj = response.json()
             pic_urls = []
             images = []
             if response.status_code == 200:
                 generation_id = rj['sdGenerationJob']['generationId']
+                print("获取到的创建ID是：", f"{generation_id}")
                 url = url + f"/{generation_id}"
-                resp = requests.get(url, headers=headers)
+                resp = await httpx.AsyncClient(timeout=config.sdwebui.timeout).get(url, headers=headers_get)
+                print("获取到的图片信息是：", f"{resp.json()}")
                 if resp.status_code == 200:
                     r = resp.json()
                     images = r['generations_by_pk']['generated_images']
@@ -214,7 +227,7 @@ class SDWebUI(DrawingAPI):
                             print("图片地址是：", image['url'])
                             pic_urls.append(image['url'])
             for pic_url in pic_urls:
-                image = await self.__download_image(pic_url)
+                image = await download_image(pic_url)
                 images.append(image)
             return images
 
@@ -250,12 +263,6 @@ class SDWebUI(DrawingAPI):
         resp.raise_for_status()
         r = resp.json()
         return [Image(base64=i) for i in r.get('images', [])]
-
-    async def __download_image(self, url) -> GraiaImage:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, proxy=self.api_info.proxy) as resp:
-                if resp.status == 200:
-                    return GraiaImage(data_bytes=await resp.read())
 
     async def translate_with_baidu(self, text: str, from_lang: str, to_lang: str) -> Any | None:
         url = "http://api.fanyi.baidu.com/api/trans/vip/translate"
