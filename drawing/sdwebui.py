@@ -168,14 +168,14 @@ class SDWebUI(DrawingAPI):
                 "authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
             }
             payload = {
-                "prompt": scene,
+                "prompt": 'a cute dog',
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
-                "width": width,
-                "height": height,
-                "negative_prompt": config.sdwebui.negative_prompt,
+                "width": 512,
+                "height": 512,
+                "negative_prompt": None,
                 "num_inference_steps": 30,
-                "promptMagic": "true" if pm else "false",
-                "num_images": image_number,
+                "promptMagic": "false",
+                "num_images": 1,
                 "public": "false",
                 "tiling": "false",
                 "guidance_scale": 7
