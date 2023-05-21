@@ -1,3 +1,4 @@
+import hashlib
 from typing import List
 import base64
 import httpx
@@ -6,10 +7,10 @@ from graia.ariadne.message.element import Image
 
 from constants import config
 from .base import DrawingAPI
-from loguru import logger
 import aiohttp
-
+import ctypes
 from graia.ariadne.message.element import Image as GraiaImage
+hashu = lambda word: ctypes.c_uint64(hash(word)).value
 
 
 def basic_auth_encode(authorization: str) -> str:
@@ -90,13 +91,15 @@ def deal_with_args(parsed_args):
 class SDWebUI(DrawingAPI):
 
     def __init__(self):
+        self.baidu_api_key = None
+        self.deepl_api_key = None
+        self.baidu_secret_key = None
         self.api_info = None
         self.headers = {
             "Authorization": f"{init_authorization()}"
         }
 
     async def text_to_img(self, prompt):
-        images = []
         if '--L' not in prompt:
             payload = {
                 'enable_hr': 'false',
@@ -168,14 +171,23 @@ class SDWebUI(DrawingAPI):
                 "content-type": "application/json",
                 "Authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
             }
+            # 翻译用户提问为英文
+        translated_prompt = await self.translate_with_deepl(scene, "zh", "en")
+        if translated_prompt is None:
+            translated_prompt = await self.translate_with_baidu(scene, "zh", "en")
+        if translated_prompt is None:
+            translated_prompt = scene
             payload = {
-                "prompt": scene,
+                "prompt": translated_prompt,
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
                 "width": width,
                 "height": height,
+                "negative_prompt": config.sdwebui.negative_prompt,
                 "num_inference_steps": 30,
-                "num_images": 1,
-                "promptMagic": "true" if pm else "false",
+                "promptMagic": True if pm else False,
+                "num_images": image_number,
+                "public": False,
+                "tiling": False,
                 "guidance_scale": 7
             }
             print("莱奥纳多的入参是：", f"{payload}")
@@ -224,3 +236,37 @@ class SDWebUI(DrawingAPI):
             async with session.get(url, proxy=self.api_info.proxy) as resp:
                 if resp.status == 200:
                     return GraiaImage(data_bytes=await resp.read())
+
+    async def translate_with_baidu(self, text: str, from_lang: str, to_lang: str) -> str:
+        url = "http://api.fanyi.baidu.com/api/trans/vip/translate"
+        salt = str(hashu(text))
+        self.baidu_api_key = '20230227001577503'
+        self.baidu_secret_key = 'o9kxQADPCdFf56FHPCIv'
+        sign_str = self.baidu_api_key + text + salt + self.baidu_secret_key  # don't forget to add the secret key
+        sign = hashlib.md5(sign_str.encode()).hexdigest()
+        params = {
+            "q": text,
+            "from": from_lang,
+            "to": to_lang,
+            "appid": self.baidu_api_key,
+            "salt": salt,
+            "sign": sign,
+        }
+        response = await self.client.get(url, params=params)
+        if response.status_code != 200:
+            return None
+        return response.json()['trans_result'][0]['dst']
+
+    async def translate_with_deepl(self, text: str, from_lang: str, to_lang: str) -> str:
+        url = "https://api-free.deepl.com/v2/translate"
+        self.deepl_api_key = '1e23ad70-40b4-7e97-4d08-2239d2e114a6:fx'
+        headers = {"Authorization": "DeepL-Auth-Key " + self.deepl_api_key}
+        data = {
+            "text": text,
+            "source_lang": from_lang,
+            "target_lang": to_lang,
+        }
+        response = await self.client.post(url, headers=headers, data=data)
+        if response.status_code != 200:
+            return None
+        return response.json()['translations'][0]['text']
