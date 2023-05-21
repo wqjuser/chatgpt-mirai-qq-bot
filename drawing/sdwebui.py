@@ -170,7 +170,7 @@ class SDWebUI(DrawingAPI):
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "Authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
+                "authorization": "Bearer f9104f8f-7083-4c1b-9acf-39011244092f"
             }
             # 翻译用户提问为英文
             translated_prompt = await self.translate_with_deepl(scene, "zh", "en")
@@ -183,7 +183,6 @@ class SDWebUI(DrawingAPI):
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
                 "width": width,
                 "height": height,
-                "negative_prompt": config.sdwebui.negative_prompt,
                 "num_inference_steps": 30,
                 "promptMagic": True if pm else False,
                 "num_images": image_number,
