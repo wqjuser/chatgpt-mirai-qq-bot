@@ -1,4 +1,5 @@
 import hashlib
+import re
 from typing import List, Any
 import base64
 import httpx
@@ -149,6 +150,10 @@ class SDWebUI(DrawingAPI):
             r = resp.json()
             return [Image(base64=i) for i in r.get('images', [])]
         else:
+            # need to remove
+            pattern_list = ['nsfw', 'sex', 'naked', 'breast', 'sexual intercourse', 'nipple', 'pornographic', 'pussy',
+                            '性', '性交', '裸体', '胸部', '色情', '乳头', '阴部']
+            pattern = '|'.join(pattern_list)
             parsed_args = {}
             scene = prompt
             image_number = 1
@@ -179,6 +184,7 @@ class SDWebUI(DrawingAPI):
                 translated_prompt = await self.translate_with_baidu(scene, "zh", "en")
             if translated_prompt is None:
                 translated_prompt = scene
+            translated_prompt = re.sub(pattern, '', translated_prompt)
             payload = {
                 "prompt": f"{config.sdwebui.prompt_prefix}, {translated_prompt}",
                 "modelId": "d2fb9cf9-7999-4ae5-8bfe-f0df2d32abf8",
