@@ -83,6 +83,11 @@ class MiddlewareBaiduCloud(Middleware):
         self.baidu_cloud = BaiduCloud()
 
     async def handle_respond(self, session_id: str, prompt: str, rendered: str, respond: Callable, action: Callable):
+        # 尝试在discord和telegram中取消百度云审核
+        if self.baidu_cloud is None:
+            print("百度云审核模块是None")
+            return await action(session_id, prompt, rendered, respond)
+        print("百度云审核模块不是None")
         # 未审核消息路径
         if not config.baiducloud.check:
             return await action(session_id, prompt, rendered, respond)
