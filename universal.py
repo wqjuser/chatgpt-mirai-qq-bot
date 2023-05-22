@@ -63,7 +63,7 @@ async def handle_message(_respond: Callable, session_id: str, message: str,
         async def call(session_id, message, rendered, respond):
             # 尝试在discord和telegram中取消百度云审核
             if request_from == BotPlatform.DiscordBot or request_from == BotPlatform.TelegramBot:
-                m.baidu_cloud = None
+                config.baiducloud.check = False
             await m.handle_respond(session_id, message, rendered, respond, n)
 
         return call
