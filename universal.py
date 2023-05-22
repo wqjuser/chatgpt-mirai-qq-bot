@@ -49,6 +49,7 @@ async def handle_message(_respond: Callable, session_id: str, message: str,
         """
         Wrapping send messages
         """
+
         async def call(session_id, message, conversation_context, respond):
             await m.handle_request(session_id, message, respond, conversation_context, n)
 
@@ -58,7 +59,11 @@ async def handle_message(_respond: Callable, session_id: str, message: str,
         """
         Wrapping respond messages
         """
+
         async def call(session_id, message, rendered, respond):
+            # 尝试在discord和telegram中取消百度云审核
+            if request_from == BotPlatform.DiscordBot or request_from == BotPlatform.TelegramBot:
+                m.baidu_cloud = None
             await m.handle_respond(session_id, message, rendered, respond, n)
 
         return call
