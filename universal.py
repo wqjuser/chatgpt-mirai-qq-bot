@@ -18,13 +18,12 @@ from conversation import ConversationHandler, ConversationContext
 from exceptions import PresetNotFoundException, BotRatelimitException, ConcurrentMessageException, \
     BotTypeNotFoundException, NoAvailableBotException, BotOperationNotSupportedException, CommandRefusedException, \
     DrawingFailedException
-from middlewares import baiducloud
 from middlewares.baiducloud import MiddlewareBaiduCloud
+from middlewares.baiducloud import BaiduCloud
 from middlewares.concurrentlock import MiddlewareConcurrentLock
 from middlewares.ratelimit import MiddlewareRatelimit
 from middlewares.timeout import MiddlewareTimeout
 from utils.text_to_speech import get_tts_voice, TtsVoiceManager, VoiceType
-
 
 middlewares = [MiddlewareTimeout(), MiddlewareRatelimit(), MiddlewareBaiduCloud(), MiddlewareConcurrentLock()]
 
@@ -67,7 +66,7 @@ async def handle_message(_respond: Callable, session_id: str, message: str,
             if request_from == BotPlatform.DiscordBot or request_from == BotPlatform.TelegramBot:
                 m.baidu_cloud = None
             else:
-                m.baidu_cloud = baiducloud
+                m.baidu_cloud = BaiduCloud()
             await m.handle_respond(session_id, message, rendered, respond, n)
 
         return call
