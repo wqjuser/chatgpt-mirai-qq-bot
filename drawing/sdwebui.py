@@ -11,6 +11,7 @@ import aiohttp
 import ctypes
 from graia.ariadne.message.element import Image as GraiaImage
 import asyncio
+
 hashu = lambda word: ctypes.c_uint64(hash(word)).value
 
 
@@ -65,6 +66,7 @@ def deal_with_args(parsed_args):
     width = 512
     height = 512
     pm = False
+    negative_prompt = ''
     if bool(parsed_args):
         if 'ar' in parsed_args:
             ar_value = parsed_args.get('ar')
@@ -85,8 +87,10 @@ def deal_with_args(parsed_args):
                 height = 576
         if 'pm' in parsed_args:
             pm = True
+        if 'np' in parsed_args:
+            negative_prompt = parsed_args.get('np')
 
-    return width, height, pm
+    return width, height, pm, negative_prompt
 
 
 async def download_image(url) -> GraiaImage:
@@ -108,6 +112,8 @@ class SDWebUI(DrawingAPI):
         }
 
     async def text_to_img(self, prompt):
+        parsed_args = parse_args(prompt)
+        width_p, height_p, pm_p, negative_prompt = deal_with_args(parsed_args)
         if '--L' not in prompt:
             payload = {
                 'enable_hr': 'false',
@@ -122,7 +128,7 @@ class SDWebUI(DrawingAPI):
                 'tiling': 'false',
                 'script_name': f'{config.sdwebui.script_name}',
                 'script_args': [f'{prompt}'],
-                'negative_prompt': config.sdwebui.negative_prompt,
+                'negative_prompt': negative_prompt if negative_prompt != '' else config.sdwebui.negative_prompt,
                 'eta': 0,
                 'sampler_name': config.sdwebui.sampler_index
             }
@@ -169,12 +175,17 @@ class SDWebUI(DrawingAPI):
             width = 512
             height = 512
             pm = False
+            negative_prompt = ''
+            default_prompt = "(nsfw:1.5), worst quality, bad quality, normal quality, cropping, out of focus, " \
+                             "bad anatomy, sketch, lowres, deformed guitar, extra hand, extra guitar, " \
+                             "extra digit, fewer digits, jpeg artifacts, signature, watermark, username, artist name"
             if scene != "":
                 parsed_args = parse_args(scene)
-                width_p, height_p, pm_p = deal_with_args(parsed_args)
+                width_p, height_p, pm_p, negative_prompt_p = deal_with_args(parsed_args)
                 width = width_p
                 height = height_p
                 pm = pm_p
+                negative_prompt = negative_prompt_p
                 index = scene.find("--")
                 if index != -1:
                     scene = scene[:index]
@@ -212,10 +223,7 @@ class SDWebUI(DrawingAPI):
                 "public": False,
                 "num_images": image_number,
                 "presetStyle": "LEONARDO",
-                "negative_prompt": "(nsfw:1.5),worst quality, bad quality, normal quality, cropping, out of focus, "
-                                   "bad anatomy,"
-                                   " sketch, lowres, deformed guitar, extra hand, extra guitar, extra digit, "
-                                   "fewer digits, jpeg artifacts, signature, watermark, username, artist name"
+                "negative_prompt": negative_prompt if negative_prompt != '' else default_prompt
             }
             print("莱奥纳多的入参是：", f"{payload}")
             response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload,
