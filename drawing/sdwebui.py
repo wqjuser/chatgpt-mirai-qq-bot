@@ -89,7 +89,7 @@ def deal_with_args(parsed_args):
             pm = True
         if 'np' in parsed_args:
             negative_prompt = parsed_args.get('np')
-
+        print("负面提示词为：", negative_prompt)
     return width, height, pm, negative_prompt
 
 
