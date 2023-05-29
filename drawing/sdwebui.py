@@ -46,11 +46,14 @@ def parse_args(args_str, default=None):
                 arg_name = arg.lstrip("-")
                 arg_values = []
             else:
-                if ", " in arg:
-                    values = [value.strip() for value in arg.split(", ")]
-                    arg_values.extend(values)
-                else:
+                if arg_name is None:
                     arg_values.append(arg)
+                else:
+                    if ", " in arg:
+                        values = [value.strip() for value in arg.split(", ")]
+                        arg_values.extend(values)
+                    else:
+                        arg_values.append(arg)
 
         if arg_name is not None:
             if len(arg_values) == 1:
