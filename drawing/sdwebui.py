@@ -228,6 +228,8 @@ class SDWebUI(DrawingAPI):
                 "public": False,
                 "num_images": image_number,
                 "presetStyle": "LEONARDO",
+                "num_inference_steps": None,
+                "init_strength": 0.4 if pm else None,
                 "negative_prompt": negative_prompt if negative_prompt != '' else default_prompt
             }
             print("莱奥纳多的入参是：", f"{payload}")
