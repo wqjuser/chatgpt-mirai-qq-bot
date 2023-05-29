@@ -40,25 +40,27 @@ def parse_args(args_str, default=None):
                     if len(arg_values) == 1:
                         arg_dict[arg_name] = arg_values[0]
                     elif len(arg_values) > 1:
-                        arg_dict[arg_name] = arg_values[0:]
+                        arg_dict[arg_name] = arg_values
                     else:
                         arg_dict[arg_name] = default
                 arg_name = arg.lstrip("-")
                 arg_values = []
             else:
-                arg_values.append(arg)
+                if ", " in arg:
+                    values = [value.strip() for value in arg.split(", ")]
+                    arg_values.extend(values)
+                else:
+                    arg_values.append(arg)
 
         if arg_name is not None:
             if len(arg_values) == 1:
                 arg_dict[arg_name] = arg_values[0]
             elif len(arg_values) > 1:
-                arg_dict[arg_name] = arg_values[0:]
+                arg_dict[arg_name] = arg_values
             else:
                 arg_dict[arg_name] = default
 
     return arg_dict
-
-    # deal with args
 
 
 def deal_with_args(parsed_args):
