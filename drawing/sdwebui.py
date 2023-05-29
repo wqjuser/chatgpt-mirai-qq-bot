@@ -230,7 +230,7 @@ class SDWebUI(DrawingAPI):
                 "presetStyle": "LEONARDO",
                 "num_inference_steps": 50,
                 "init_strength": 0.4 if pm else None,
-                "highContrast": True if pm else False,
+                "contrastHigh": True if pm else False,
                 "negative_prompt": negative_prompt if negative_prompt != '' else default_prompt
             }
             response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload,
