@@ -230,13 +230,11 @@ class SDWebUI(DrawingAPI):
                 "presetStyle": "LEONARDO",
                 "num_inference_steps": 50,
                 "init_strength": 0.4 if pm else None,
-                "high_contrast": True if pm else False,
+                "highContrast": True if pm else False,
                 "negative_prompt": negative_prompt if negative_prompt != '' else default_prompt
             }
-            print("莱奥纳多的入参是：", f"{payload}")
             response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(url, json=payload,
                                                                                     headers=headers_post)
-            print("莱奥纳多的返回值是：", f"{response.json()}")
             rj = response.json()
             pic_urls = []
             images = []
