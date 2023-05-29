@@ -89,7 +89,10 @@ def deal_with_args(parsed_args):
             pm = True
         if 'np' in parsed_args:
             negative_prompt = parsed_args.get('np')
+            # 去除多个逗号
             negative_prompt = re.sub(',+', ', ', ', '.join(negative_prompt))
+            # 去除多个空格
+            negative_prompt = re.sub(r'\s+', ' ', negative_prompt)
     return width, height, pm, f"{negative_prompt}"
 
 
