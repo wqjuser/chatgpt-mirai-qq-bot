@@ -1,4 +1,5 @@
 import hashlib
+import random
 import re
 from typing import List, Any
 import base64
@@ -148,15 +149,18 @@ class SDWebUI(DrawingAPI):
                     payload[key] = value
 
             if '--real-c' in prompt:
+                models = ['braBeautifulRealistic.safetensors', 'chilloutmix.safetensors']
                 option_payload = {
-                    "sd_model_checkpoint": "chilloutmix.safetensors",
+                    "sd_model_checkpoint": random.choice(models),
                 }
                 response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(
                     f"{config.sdwebui.api_url}sdapi/v1/options",
                     json=option_payload, headers=self.headers)
             else:
+                models = ['meinamix.safetensors', 'ghostmix.safetensors', 'dreamshaper.safetensors',
+                          'cetusmix.safetensors', 'anything.safetensors']
                 option_payload = {
-                    "sd_model_checkpoint": "meinamix.safetensors",
+                    "sd_model_checkpoint": random.choice(models),
                 }
                 response = await httpx.AsyncClient(timeout=config.sdwebui.timeout).post(
                     f"{config.sdwebui.api_url}sdapi/v1/options",
