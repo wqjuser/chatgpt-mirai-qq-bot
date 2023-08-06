@@ -52,7 +52,11 @@ class OpenAIChatbot:
             raise
 
     def add_to_conversation(self, message: str, role: str, session_id: str = "default") -> None:
-        self.conversation[session_id].append({"role": role, "content": message})
+        if role and message is not None:
+            self.conversation[session_id].append({"role": role, "content": message})
+        else:
+            logger.warning("出现错误！返回消息为空，不添加到会话。")
+            raise ValueError("出现错误！返回消息为空，不添加到会话。")
 
     # https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
     def count_tokens(self, session_id: str = "default", model: str = DEFAULT_ENGINE):
@@ -71,9 +75,10 @@ class OpenAIChatbot:
         for message in self.conversation[session_id]:
             num_tokens += tokens_per_message
             for key, value in message.items():
-                num_tokens += len(encoding.encode(value))
-                if key == "name":
-                    num_tokens += tokens_per_name
+                if value is not None:
+                    num_tokens += len(encoding.encode(value))
+                    if key == "name":
+                        num_tokens += tokens_per_name
         num_tokens += 3  # every reply is primed with assistant
         return num_tokens
 
@@ -248,12 +253,14 @@ class ChatGPTAPIAdapter(BotAdapter):
                         if 'choices' in event and len(event['choices']) > 0 and 'delta' in event['choices'][0]:
                             delta = event['choices'][0]['delta']
                             if 'role' in delta:
-                                response_role = delta['role']
+                                if delta['role'] is not None:
+                                    response_role = delta['role']
                             if 'content' in delta:
                                 event_text = delta['content']
-                                completion_text += event_text
-                                self.latest_role = response_role
-                                yield event_text
+                                if event_text is not None:
+                                    completion_text += event_text
+                                    self.latest_role = response_role
+                                    yield event_text
         self.bot.add_to_conversation(completion_text, response_role, session_id)
 
     async def compressed_session(self, session_id: str):
